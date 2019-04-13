@@ -1,0 +1,5 @@
+package com.redpacket.service.impl;
+
+public class RedisRedPacketServiceImpl {
+
+}

@@ -1,0 +1,5 @@
+package com.redpacket.controller;
+
+public class UserRedPacketController {
+
+}

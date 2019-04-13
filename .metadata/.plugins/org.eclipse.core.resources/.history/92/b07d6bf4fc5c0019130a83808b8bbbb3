@@ -1,0 +1,5 @@
+package com.redpacket.mapper;
+
+public interface UserRedPacket {
+
+}
