@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop.xsd
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!--加载数据库配置文件-->
+    <context:property-placeholder location="classpath:mysql.properties" ignore-unresolvable="true"  />
+    <!--加载缓存配置文件-->
+    <context:property-placeholder location="classpath:redis.properties" ignore-unresolvable="true"  />
+
+    <!--配置数据源dbcp连接池-->
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" >
+        <property name="driverClassName" value="${jdbc.driver}" />
+        <property name="url" value="${jdbc.url}" />
+        <property name="username" value="${jdbc.username}" />
+        <property name="password" value="${jdbc.password}" />
+        <property name="maxActive" value="${jdbc.maxActive}" />
+        <property name="maxIdle" value="${jdbc.maxIdle}" />
+        <property name="maxWait" value="${jdbc.maxWait}" />
+    </bean>
+
+	<!-- jedis 配置 -->
+    <bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig">
+        <property name="maxIdle" value="${redis.maxIdle}" />
+        <property name="maxWaitMillis" value="${redis.maxWaitMillis}" />
+        <property name="maxTotal" value="${redis.maxTotal}" />
+    </bean>
+    
+    <!-- redis服务器中心 -->
+    <bean id="redisConnectionFactory"
+        class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+        <property name="poolConfig" ref="poolConfig" />
+        <property name="port" value="${redis.port}" />
+        <property name="hostName" value="${redis.host}" />
+        <!-- usePool：是否使用连接池 -->
+        <property name="usePool" value="true"/>
+    </bean>
+    
+    <!-- 配置redisTemplate -->
+    <bean id="redisTemplate" name="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
+        <property name="connectionFactory" ref="redisConnectionFactory" />
+        <property name="keySerializer" ref="stringRedisSerializer" />
+        <property name="valueSerializer" ref="stringRedisSerializer" />
+        <property name="hashKeySerializer" ref="stringRedisSerializer" />
+        <property name="hashValueSerializer" ref="stringRedisSerializer" />
+        <!-- <property name="enableTransactionSupport" value="true"/> -->
+    </bean>
+    
+    <!-- 配置序列化 -->
+    <bean id="stringRedisSerializer"
+        class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+    
+    <!-- 配置缓存 -->
+    <bean id="cacheManager" class="org.springframework.data.redis.cache.RedisCacheManager">
+        <constructor-arg ref="redisTemplate" />
+    </bean>
+
+	    <!--配置SqlSessionFactory-->
+    <bean id="sessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--加载mybatis配置文件-->
+        <property name="configLocation" value="classpath:mybatis/mybatis.cfg.xml"/>
+        <!--数据源-->
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!--Mapper批量扫描，从Mapper包扫描接口，自动创建代理对象，并在Spring容器中自动注册
+	    使用 Mybatis与Spring整合包的这个 Mapper 扫描器后， Mybatis 配置文件里的扫描器，就可以取消掉了
+	    遵循的规范 不变
+	    自动扫描出来的Mapper的bean的id为Mapper类名（首字母小写）
+    -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!--如果需要扫描多个报下的mapper,每个包中间使用半角逗号分开-->
+        <property name="basePackage" value="com.redpacket.mapper" />
+        <property name="sqlSessionFactoryBeanName" value="sessionFactory" />
+    </bean>
+</beans>

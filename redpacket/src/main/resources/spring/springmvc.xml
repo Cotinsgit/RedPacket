@@ -25,14 +25,14 @@
     <mvc:annotation-driven/>
 
     <!--组件扫描，可以扫描 controller、Service、...
-    并注册添加到 spring 容器中
-    这里扫描 controller，指定controller的包
+           并注册添加到 spring 容器中
+           这里扫描 controller，指定controller的包
     -->
     <context:component-scan base-package="com.redpacket.controller"/>
     
     <!--视图解析器-->
     <!--
-    需要配置解析jsp的视图解析器
+           需要配置解析jsp的视图解析器
     jsp解析，默认使用jstl标签解析
     -->
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">

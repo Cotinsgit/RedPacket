@@ -154,6 +154,7 @@ public class UserRedPacketServiceImpl implements UserRedPacketService {
 	 return FAILED;
 	 }
 
+	@SuppressWarnings("rawtypes")
 	@Autowired
 	private RedisTemplate redisTemplate = null;
 

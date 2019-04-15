@@ -34,6 +34,7 @@ public class RedisRedPacketServiceImpl implements RedisRedPacketService {
 	private DataSource dataSource = null; // 数据源
 
 	// 开启新线程运行
+	@SuppressWarnings("unchecked")
 	@Async
 	public void saveUserRedPacketByRedis(Long redPacketId, Double unitAmount) {
 		System.err.println("开始保存数据");
